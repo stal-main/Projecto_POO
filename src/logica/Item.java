@@ -3,7 +3,7 @@ package logica;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Object implements Serializable {
+public class Item implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -19,7 +19,7 @@ public class Object implements Serializable {
 	
 	private Loan loan;
 	
-	public Object(String code, String name, String description, Type type) {
+	public Item(String code, String name, String description, Type type) {
 		
 		this.code = code;
 		
