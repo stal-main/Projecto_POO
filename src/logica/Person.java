@@ -68,6 +68,22 @@ public class Person implements Serializable {
 		
 		loans.remove(l);
 	}
+	
+	public ArrayList<Loan> getLoans() {
+		
+		return loans;
+	}
+	
+	public boolean hasLoans() {
+		
+		return !loans.isEmpty();
+	}
+	
+	@Override
+	public String toString() {
+		
+		return name;
+	}
 
 	
 }
