@@ -148,7 +148,7 @@ public class Control implements Serializable {
 		
 		if(p.hasLoans()) {
 			
-			throw new Exception("");
+			throw new Exception(p.getName() + "can't be deleted because of active loans");
 		}
 		
 		people.remove(p);
@@ -162,9 +162,91 @@ public class Control implements Serializable {
 	
 	//Categorias
 	
+	public void createCategory(String name) {
+		
+		categories.add(new Category(name));
+	}
+	
+	public void updateCategory(Category c, String name) {
+		
+		c.setName(name);
+	}
+	
+	public void deleteCategory(Category c) {
+		
+		for (Item i : new ArrayList<>(c.getItems())) {
+			
+			i.deleteCategory(c);
+		}
+		
+		categories.remove(c);
+	}
+	
+	
+	public ArrayList<Category> getCategories() {
+		
+		return categories;
+	}
+	
 	//Tipos
 	
+	public void createType(String name, String desc) {
+		
+		types.add(new Type(name, desc));
+	}
+	
+	public void updateType(Type t, String name, String desc) {
+		
+		t.setName(name);
+		
+		t.setDescription(desc);
+	}
+	
+	public void deleteType(Type t) throws Exception {
+	
+		if (t == genericType) {
+			
+			throw new Exception("The generic type can't be deleted");
+		}
+		
+		for (Item i : new ArrayList<>(t.getItems())) {
+			
+			i.setType(genericType);
+			
+			genericType.addItem(i);
+		}
+		
+		types.remove(t);
+	
+	}
+	
+	public ArrayList<Type> getTypes() {
+		
+		return types;
+	}
+	
+	public Type getGenericType() {
+		
+		return genericType;
+	}
+	
 	//Prestamos
+	
+	public Loan doLoan(Person p, ArrayList<Item> itemLent) {
+		
+		Loan l = new Loan(p);
+		
+		for (Item i : itemLent) {
+			
+			l.addItem(i);
+		}
+		
+		p.addLoan(l);
+		
+		loans.add(l);
+		
+		return l;
+	}
 	
 	//Alertas
 	
