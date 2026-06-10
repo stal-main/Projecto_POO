@@ -95,6 +95,11 @@ public class Item implements Serializable {
     	this.loan = l;
     }
     
+    public boolean isLend() {
+    	
+    	return loan != null;
+    }
+    
     @Override
     public String toString() {
     	
