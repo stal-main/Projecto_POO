@@ -130,6 +130,36 @@ public class Control implements Serializable {
 	
 	//Gente
 	
+	public void createPerson(String name, String phone, String email) {
+		
+		people.add(new Person(name, phone, email));
+	}
+	
+	public void updatePerson(Person p, String name, String phone, String email) {
+		
+		p.setName(name);
+		
+		p.setPhone(phone);
+		
+		p.setEmail(email);
+	}
+	
+	public void deletePerson(Person p) throws Exception {
+		
+		if(p.hasLoans()) {
+			
+			throw new Exception("");
+		}
+		
+		people.remove(p);
+	}
+	
+	public ArrayList<Person> getPeople() {
+		
+		return people;
+		
+	}
+	
 	//Categorias
 	
 	//Tipos
