@@ -263,7 +263,48 @@ public class Control implements Serializable {
 		l.deleteItem(i);
 	}
 	
+	public void endLoan(Loan l) {
+		
+		l.endLoan();
+		
+		l.getPerson().deleteLoan(l);
+		
+		loans.remove(l);
+	}
+	
+	public void addAlert(Loan l, String msg, Date date, int interval, AlertType type) {
+		
+		l.setAlert(new Alert(msg, date, interval, type, l));
+	}
+	
+	public ArrayList<Loan> getLoans() {
+		
+		return loans;
+	}
+	
 	//Alertas
+	
+	public ArrayList<Alert> verifyAlerts() {
+		
+		ArrayList<Alert> actives = new ArrayList<>();
+		
+		for (Loan l : loans) {
+			
+			Alert a = l.getAlert();
+			
+			if (a != null && a.mustActivate()) {
+				
+				actives.add(a);
+				
+				if (a.getType() == AlertType.UNIQUE) {
+					
+					l.setAlert(null);
+				}
+			}
+		}
+		
+		return actives;
+	}
 	
 	//Reportes
 	
