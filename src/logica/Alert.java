@@ -59,7 +59,7 @@ public class Alert implements Serializable {
 		
 		if (type == AlertType.RECURRENT && interval > 0) {
 			
-			long intervalMsg = (long) interval * 24L * 60L * 1000L;
+			long intervalMsg = (long) interval * 24L * 60L * 60L * 1000L;
 			
 			date = new Date(date.getTime() + intervalMsg);
 		}

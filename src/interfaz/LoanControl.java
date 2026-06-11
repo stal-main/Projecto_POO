@@ -8,7 +8,7 @@ public class LoanControl {
 
 	public static void main(String[] args) {
 		
-		control = new Control();
+		control = Control.loadData();
 
 	}
 

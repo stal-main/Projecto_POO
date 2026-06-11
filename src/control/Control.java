@@ -149,7 +149,7 @@ public class Control implements Serializable {
 		
 		if(p.hasLoans()) {
 			
-			throw new Exception(p.getName() + "can't be deleted because of active loans");
+			throw new Exception(p.getName() + " can't be deleted because of active loans");
 		}
 		
 		people.remove(p);
@@ -300,6 +300,10 @@ public class Control implements Serializable {
 				if (a.getType() == AlertType.UNIQUE) {
 					
 					l.setAlert(null);
+				}
+				
+				else {
+					a.activate();
 				}
 			}
 		}
