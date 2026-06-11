@@ -4,6 +4,7 @@ import logica.*;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 
 public class Control implements Serializable {
@@ -307,6 +308,46 @@ public class Control implements Serializable {
 	}
 	
 	//Reportes
+	
+	public String reportByUser() {
+		
+		StringBuilder sb = new StringBuilder("Report by user\n");
+		
+		ArrayList<Person> ordered = new ArrayList<>(people);
+		
+		ordered.sort(Comparator.comparing(Person::getName));
+		
+		for (Person p : ordered) {
+			
+			sb.append("Person: ").append(p.getName()).append("\n");
+			
+			sb.append("Phone: ").append(p.getPhone()).append("\n");
+			
+			sb.append("Email: ").append(p.getEmail()).append("\n");
+			
+			if (p.getLoans().isEmpty()) {
+				
+				sb.append("No active loans\n");
+			}
+			
+			else {
+				
+				for (Loan l : p.getLoans()) {
+					
+					sb.append(" Loan (").append(l.getDate()).append("):\n");
+					
+					for (Item i : l.getItems()) {
+						
+						sb.append(" - ").append(i).append("\n");
+					}
+				}
+			}
+			
+			sb.append(" \n");
+		}
+		
+		return sb.toString();
+	}
 	
 	//Guardado y cargado de datos
 	
