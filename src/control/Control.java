@@ -144,7 +144,7 @@ public class Control implements Serializable {
 		p.setEmail(email);
 	}
 	
-	public void deletePerson(Person p) throws Exception {
+	public void removePerson(Person p) throws Exception {
 		
 		if(p.hasLoans()) {
 			
@@ -172,7 +172,7 @@ public class Control implements Serializable {
 		c.setName(name);
 	}
 	
-	public void deleteCategory(Category c) {
+	public void removeCategory(Category c) {
 		
 		for (Item i : new ArrayList<>(c.getItems())) {
 			
@@ -202,7 +202,7 @@ public class Control implements Serializable {
 		t.setDescription(desc);
 	}
 	
-	public void deleteType(Type t) throws Exception {
+	public void removeType(Type t) throws Exception {
 	
 		if (t == genericType) {
 			
@@ -246,6 +246,21 @@ public class Control implements Serializable {
 		loans.add(l);
 		
 		return l;
+	}
+	
+	public void addItemToLoan(Loan l, Item i) {
+		
+		l.addItem(i);
+	}
+	
+	public void removeItemFromLoan(Loan l, Item i) {
+		
+		l.deleteItem(i);
+	}
+	
+	public void returnItem(Loan l, Item i) {
+		
+		l.deleteItem(i);
 	}
 	
 	//Alertas
