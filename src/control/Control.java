@@ -349,6 +349,101 @@ public class Control implements Serializable {
 		return sb.toString();
 	}
 	
+	public String reportePorItem() {
+		
+        StringBuilder sb = new StringBuilder("Report by item\n");
+ 
+        ArrayList<Item> ordered = new ArrayList<>(items);
+        
+        ordered.sort(Comparator.comparing(Item::getName));
+ 
+        for (Item i : ordered) {
+        	
+            sb.append("item: ").append(i.getName()).append(" [").append(i.getCode()).append("]\n");
+            
+            sb.append("Description: ").append(i.getDescription()).append("\n");
+            
+            sb.append("Type: ").append(i.getType().getName()).append("\n");
+            
+ 
+            if (i.isLend()) {
+            	
+                sb.append("Status: Lend to ").append(i.getLoan().getPerson().getName()).append("\n");
+            } 
+            
+            else {
+            	
+                sb.append("Status: Available\n");
+            }
+            
+            sb.append("\n");
+        }
+        
+        return sb.toString();
+    }
+ 
+    public String reportePorCategoria() {
+    	
+        StringBuilder sb = new StringBuilder("Report by category\n");
+ 
+        ArrayList<Category> ordered = new ArrayList<>(categories);
+        
+        ordered.sort(Comparator.comparing(Category::getName));
+ 
+        for (Category c : ordered) {
+        	
+            sb.append("Category: ").append(c.getName()).append("\n");
+ 
+            if (c.getItems().isEmpty()) {
+            	
+                sb.append("No items in this category\n");
+            } 
+            
+            else {
+            	
+                for (Item i : c.getItems()) {
+                	
+                    sb.append(" - ").append(i).append("\n");
+                }
+            }
+            
+            sb.append("\n");
+        }
+        
+        return sb.toString();
+    }
+ 
+    public String reportePorTipo() {
+    	
+        StringBuilder sb = new StringBuilder("Report by type\n");
+ 
+        ArrayList<Type> ordered = new ArrayList<>(types);
+        
+        ordered.sort(Comparator.comparing(Type::getName));
+ 
+        for (Type t : ordered) {
+        	
+            sb.append("Type: ").append(t.getName()).append("\n");
+ 
+            if (t.getItems().isEmpty()) {
+            	
+                sb.append("no items of this type\n");
+            } 
+            
+            else {
+            	
+                for (Item i : t.getItems()) {
+                	
+                    sb.append(" - ").append(i).append("\n");
+                }
+            }
+            
+            sb.append("\n");
+        }
+        
+        return sb.toString();
+    }
+	
 	//Guardado y cargado de datos
 	
 	public void saveData() {
