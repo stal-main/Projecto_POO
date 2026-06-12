@@ -43,71 +43,133 @@ public class Control implements Serializable {
 		
 	}
 	
-	//Cosas
+	//Buscadores (para buscar)
 	
-	public void createItem(String code, String name, String desc, Type type, ArrayList<Category> cats) {
-		
-		Item i = new Item(code, name, desc, type);
-		
-		type.addItem(i);
-		
-		if (cats != null) {
-			
-			for (Category c : cats) {
-				
-				i.addCategory(c);
-				
-				c.addItem(i);
+	private Item findItem(String code) throws Exception {
+		 
+		for (Item i : items) {
+ 
+			if (i.getCode().equals(code)) {
+ 
+				return i;
 			}
 		}
-		
+ 
+		throw new Exception("Item with code '" + code + "' not found");
+	}
+ 
+	private Person findPerson(String name) throws Exception {
+ 
+		for (Person p : people) {
+ 
+			if (p.getName().equals(name)) {
+ 
+				return p;
+			}
+		}
+ 
+		throw new Exception("Person '" + name + "' not found");
+	}
+ 
+	private Category findCategory(String name) throws Exception {
+ 
+		for (Category c : categories) {
+ 
+			if (c.getName().equals(name)) {
+ 
+				return c;
+			}
+		}
+ 
+		throw new Exception("Category '" + name + "' not found");
+	}
+ 
+	private Type findType(String name) throws Exception {
+ 
+		for (Type t : types) {
+ 
+			if (t.getName().equals(name)) {
+ 
+				return t;
+			}
+		}
+ 
+		throw new Exception("Type '" + name + "' not found");
+	}
+	
+	//Cosas
+	
+	public void createItem(String code, String name, String desc, String typeName) throws Exception {
+		 
+		if (getItem(code) != null) {
+ 
+			throw new Exception("An item with code '" + code + "' already exists");
+		}
+ 
+		Type type = findType(typeName);
+ 
+		Item i = new Item(code, name, desc, type);
+ 
+		type.addItem(i);
+ 
 		items.add(i);
 	}
 	
-	public void updateItem(Item i, String name, String desc, Type type, ArrayList<Category> cats) {
-		
-		i.getType().deleteItem(i);
-		
-		for (Category c : new ArrayList<>(i.getCategories())) {
-			
-			c.deleteItem(i);
-			
-			i.deleteCategory(c);
-		}
-		
-		i.setName(name);
-		
-		i.setDescription(desc);
-		
-		i.setType(type);
-		
-		type.addItem(i);
-		
-		if (cats != null) {
-		
-			for (Category c : cats) {
-				
-				i.addCategory(c);
-				
-				c.addItem(i);
-			}
-		}
+	public void addCategoryToItem(String itemCode, String categoryName) throws Exception {
+		 
+		Item i = findItem(itemCode);
+ 
+		Category c = findCategory(categoryName);
+ 
+		i.addCategory(c);
+ 
+		c.addItem(i);
 	}
 	
-	public void removeItem(Item i) throws Exception {
-		
-		if (i.isLend()) {
-			
-			throw new Exception("This item " + i.getName() + " can't be deleted because it's being lend");
-		}
-		
+	public void removeCategoryFromItem(String itemCode, String categoryName) throws Exception {
+		 
+		Item i = findItem(itemCode);
+ 
+		Category c = findCategory(categoryName);
+ 
+		i.deleteCategory(c);
+ 
+		c.deleteItem(i);
+	}
+	
+	public void updateItem(String itemCode, String name, String desc, String typeName) throws Exception {
+		 
+		Item i = findItem(itemCode);
+ 
+		Type newType = findType(typeName);
+ 
 		i.getType().deleteItem(i);
-		
+ 
+		i.setName(name);
+ 
+		i.setDescription(desc);
+ 
+		i.setType(newType);
+ 
+		newType.addItem(i);
+	}
+	
+	public void removeItem(String code) throws Exception {
+		 
+		Item i = findItem(code);
+ 
+		if (i.isLend()) {
+ 
+			throw new Exception("Item " + i.getName() + " can't be deleted because it's currently lent out");
+		}
+ 
+		i.getType().deleteItem(i);
+ 
 		for (Category c : new ArrayList<>(i.getCategories())) {
-			
+ 
 			c.deleteItem(i);
 		}
-		
+ 
 		items.remove(i);
 	}
 	
@@ -131,27 +193,39 @@ public class Control implements Serializable {
 	
 	//Gente
 	
-	public void createPerson(String name, String phone, String email) {
-		
+	public void createPerson(String name, String phone, String email) throws Exception {
+		 
+		for (Person p : people) {
+ 
+			if (p.getName().equals(name)) {
+ 
+				throw new Exception("A person named " + name + " already exists");
+			}
+		}
+ 
 		people.add(new Person(name, phone, email));
 	}
 	
-	public void updatePerson(Person p, String name, String phone, String email) {
-		
-		p.setName(name);
-		
+	public void updatePerson(String personName, String newName, String phone, String email) throws Exception {
+		 
+		Person p = findPerson(personName);
+ 
+		p.setName(newName);
+ 
 		p.setPhone(phone);
-		
+ 
 		p.setEmail(email);
 	}
 	
-	public void removePerson(Person p) throws Exception {
-		
-		if(p.hasLoans()) {
-			
-			throw new Exception(p.getName() + " can't be deleted because of active loans");
+	public void removePerson(String name) throws Exception {
+		 
+		Person p = findPerson(name);
+ 
+		if (p.hasLoans()) {
+ 
+			throw new Exception(" " + p.getName() + " can't be deleted because of active loans");
 		}
-		
+ 
 		people.remove(p);
 	}
 	
@@ -163,23 +237,35 @@ public class Control implements Serializable {
 	
 	//Categorias
 	
-	public void createCategory(String name) {
-		
+	public void createCategory(String name) throws Exception {
+		 
+		for (Category c : categories) {
+ 
+			if (c.getName().equals(name)) {
+ 
+				throw new Exception("A category named " + name + " already exists");
+			}
+		}
+ 
 		categories.add(new Category(name));
 	}
 	
-	public void updateCategory(Category c, String name) {
-		
-		c.setName(name);
+	public void updateCategory(String categoryName, String newName) throws Exception {
+		 
+		Category c = findCategory(categoryName);
+ 
+		c.setName(newName);
 	}
 	
-	public void removeCategory(Category c) {
-		
+	public void removeCategory(String name) throws Exception {
+		 
+		Category c = findCategory(name);
+ 
 		for (Item i : new ArrayList<>(c.getItems())) {
-			
+ 
 			i.deleteCategory(c);
 		}
-		
+ 
 		categories.remove(c);
 	}
 	
@@ -191,34 +277,45 @@ public class Control implements Serializable {
 	
 	//Tipos
 	
-	public void createType(String name, String desc) {
-		
+	public void createType(String name, String desc) throws Exception {
+		 
+		for (Type t : types) {
+ 
+			if (t.getName().equals(name)) {
+ 
+				throw new Exception("A type named " + name + " already exists");
+			}
+		}
+ 
 		types.add(new Type(name, desc));
 	}
 	
-	public void updateType(Type t, String name, String desc) {
-		
-		t.setName(name);
-		
+	public void updateType(String typeName, String newName, String desc) throws Exception {
+		 
+		Type t = findType(typeName);
+ 
+		t.setName(newName);
+ 
 		t.setDescription(desc);
 	}
 	
-	public void removeType(Type t) throws Exception {
-	
+	public void removeType(String name) throws Exception {
+		 
+		Type t = findType(name);
+ 
 		if (t == genericType) {
-			
+ 
 			throw new Exception("The generic type can't be deleted");
 		}
-		
+ 
 		for (Item i : new ArrayList<>(t.getItems())) {
-			
+ 
 			i.setType(genericType);
-			
+ 
 			genericType.addItem(i);
 		}
-		
+ 
 		types.remove(t);
-	
 	}
 	
 	public ArrayList<Type> getTypes() {
@@ -233,43 +330,63 @@ public class Control implements Serializable {
 	
 	//Prestamos
 	
-	public Loan doLoan(Person p, ArrayList<Item> itemLent) {
-		
+	public Loan doLoan(String personName, ArrayList<String> itemCodes) throws Exception {
+		 
+		Person p = findPerson(personName);
+ 
 		Loan l = new Loan(p);
-		
-		for (Item i : itemLent) {
-			
+ 
+		for (String code : itemCodes) {
+ 
+			Item i = findItem(code);
+ 
+			if (i.isLend()) {
+ 
+				throw new Exception("Item '" + i.getName() + "' is already lent out");
+			}
+ 
 			l.addItem(i);
 		}
-		
+ 
 		p.addLoan(l);
-		
+ 
 		loans.add(l);
-		
+ 
 		return l;
 	}
 	
-	public void addItemToLoan(Loan l, Item i) {
-		
+	public void addItemToLoan(Loan l, String itemCode) throws Exception {
+		 
+		Item i = findItem(itemCode);
+ 
+		if (i.isLend()) {
+ 
+			throw new Exception("Item '" + i.getName() + "' is already lent out");
+		}
+ 
 		l.addItem(i);
 	}
 	
-	public void removeItemFromLoan(Loan l, Item i) {
-		
+	public void removeItemFromLoan(Loan l, String itemCode) throws Exception {
+		 
+		Item i = findItem(itemCode);
+ 
 		l.deleteItem(i);
 	}
 	
-	public void returnItem(Loan l, Item i) {
-		
+	public void returnItem(Loan l, String itemCode) throws Exception {
+		 
+		Item i = findItem(itemCode);
+ 
 		l.deleteItem(i);
 	}
 	
 	public void endLoan(Loan l) {
-		
+		 
 		l.endLoan();
-		
+ 
 		l.getPerson().deleteLoan(l);
-		
+ 
 		loans.remove(l);
 	}
 	
