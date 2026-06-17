@@ -29,7 +29,19 @@ public class AdminWindow extends JFrame {
 	
 	private void buildUI() {
 		
+		JTabbedPane tabs = new JTabbedPane();
 		
+        tabs.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        
+        tabs.addTab("Items", new ItemsPanel(control));
+        
+        tabs.addTab("People", new PersonsPanel(control));
+        
+        //tabs.addTab("Categories", new CategoriesPanel(control));
+        
+        //tabs.addTab("Types", new TypesPanel(control));
+        
+        add(tabs);
 	}
 
 }
