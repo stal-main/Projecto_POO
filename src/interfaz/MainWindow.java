@@ -101,6 +101,10 @@ public class MainWindow extends JFrame {
 		
 		btnAdmin.addActionListener(e -> openAdminWindow());
 		
+		btnLoans.addActionListener(e -> openLoansWindow());
+		
+		btnReports.addActionListener(e -> openReportsWindow());
+		
 	}
 	
 	private JButton makeNavButton(String text, Color color) {
@@ -129,6 +133,16 @@ public class MainWindow extends JFrame {
 		new AdminWindow(control).setVisible(true);
 	}
 	
+	private void openLoansWindow() {
+		
+		new LoansWindow(control).setVisible(true);
+	}
+	
+	private void openReportsWindow() {
+		
+		new ReportsWindow(control).setVisible(true);
+	}
+	
 	public void checkAlerts() {
 		
 		ArrayList<Alert> actives = control.verifyAlerts();
@@ -139,6 +153,19 @@ public class MainWindow extends JFrame {
 		}
 		
 		StringBuilder sb = new StringBuilder();
+		
+		sb.append("The following alerts have been activated: \n\n");
+		
+		for (Alert a : actives) {
+			
+			sb.append(" ").append(a.getMessage()).append("\n");
+			
+			sb.append(" Loans: ").append(a.getLoan()).append("\n");
+			
+			sb.append(" Type: ").append(a.getType()).append("\n\n");
+		}
+		
+		JOptionPane.showMessageDialog(this, sb.toString(), "Pending Alerts (" + actives.size(), JOptionPane.WARNING_MESSAGE);
 		
 		control.saveData();
 	}
