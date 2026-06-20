@@ -220,17 +220,34 @@ public class ItemsPanel extends JPanel {
     	
     	tableModel.setRowCount(0);
     	
+    	for (Item i : control.getItems()) {
+    		
+    		String status = i.isLend() ? "Lend to " + i.getLoan().getPerson().getName() : "Available";
+    		
+    		tableModel.addRow(new Object[] {i.getCode(), i.getName(), i.getType().getName(), status});
+    	}
+    	
     }
     
     public void refreshTypesCombo() {
     	
     	cmbType.removeAllItems();
     	
+    	for (Type t : control.getTypes()) {
+    		
+    		cmbType.addItem(t.getName());
+    	}
+    	
     }
     
     public void refreshCategoriesList() {
     	
     	catListModel.clear();
+    	
+    	for (Category c : control.getCategories()) {
+    		
+    		catListModel.addElement(c.getName());
+    	}
     	
     }
     
@@ -278,6 +295,10 @@ public class ItemsPanel extends JPanel {
         		}
         	}
         }
+        
+        int[] array = index.stream().mapToInt(Integer::intValue).toArray();
+        
+        lstCategories.setSelectedIndices(array);
     }
     
     public void clearForm() {
@@ -353,6 +374,45 @@ public class ItemsPanel extends JPanel {
     		return;
     	}
     	
+    	String code = (String) tableModel.getValueAt(row, 0);
+    	
+    	String name = txtName.getText().trim();
+    	
+    	String desc = txtDesc.getText().trim();
+    	
+        String type = (String) cmbType.getSelectedItem();
+    	
+    	if (name.isEmpty()) {
+    		
+    		JOptionPane.showMessageDialog(this, "The name is needed", "Error", JOptionPane.ERROR_MESSAGE);
+    		
+    		return;
+    	}
+    	
+    	try {
+    		
+    		control.updateItem(code, name, desc, type);
+    		
+    		Item item = control.getItem(code);
+    		
+    		for (Category c: new ArrayList<>(item.getCategories())) {
+    			
+    			control.removeCategoryFromItem(code, c.getName());
+    		}
+    		
+    		for (String cat : lstCategories.getSelectedValuesList()) {
+    			 control.addCategoryToItem(code, cat);
+    		}
+    		
+    		refreshTable();
+    		
+    		clearForm();
+    	}
+    	
+    	catch (Exception e) {
+    		JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+    	}
+    	
     	
     }
     
@@ -366,6 +426,31 @@ public class ItemsPanel extends JPanel {
     		
     		return;
     	}
+    	
+    	String code = (String) tableModel.getValueAt(row, 0);
+    	
+        String name = (String) tableModel.getValueAt(row, 1);
+        
+        int confirm = JOptionPane.showConfirmDialog(this, "Delete item " + name + "?", "Confirm", JOptionPane.YES_NO_OPTION);
+        
+        if (confirm != JOptionPane.YES_OPTION) {
+        	
+        	return;
+        }
+        
+        try {
+        	
+        	control.removeItem(code);
+        	
+        	refreshTable();
+        	
+        	clearForm();
+        }
+        
+        catch (Exception e) {
+        	
+        	JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
 }
