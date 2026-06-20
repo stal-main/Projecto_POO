@@ -37,9 +37,9 @@ public class AdminWindow extends JFrame {
         
         tabs.addTab("People", new PersonsPanel(control));
         
-        //tabs.addTab("Categories", new CategoriesPanel(control));
+        tabs.addTab("Categories", new CategoriesPanel(control));
         
-        //tabs.addTab("Types", new TypesPanel(control));
+        tabs.addTab("Types", new TypesPanel(control));
         
         add(tabs);
 	}
