@@ -7,6 +7,7 @@ import logica.*;
 import javax.swing.table.DefaultTableModel;
 
 import java.awt.*;
+import java.util.ArrayList;
 
 import javax.swing.*;
 
@@ -133,6 +134,18 @@ public class LoansWindow extends JFrame {
         itemsTable.setRowHeight(24);
         
         rightPanel.add(new JScrollPane(itemsTable), BorderLayout.CENTER);
+        
+        //Botones del panel derecho
+        
+        JButton btnReturn = new JButton("Return selected item");
+        
+        btnReturn.setBackground(new Color(200, 130, 30));
+        
+        btnReturn.setForeground(Color.WHITE);
+        
+        btnReturn.setFocusPainted(false);
+        
+        rightPanel.add(btnReturn, BorderLayout.SOUTH);
     	
     	JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, rightPanel);
     	
@@ -142,6 +155,8 @@ public class LoansWindow extends JFrame {
     	
     	add(main, BorderLayout.CENTER);
     	
+    	btnNew.addActionListener(e -> openNewLoanDialog());
+    	
     }
     
     private void refreshLoansTable() {
@@ -149,6 +164,78 @@ public class LoansWindow extends JFrame {
     }
     
     private void refreshItemsTable() {
+    	
+    }
+    
+    private Loan getSelectedLoan() {
+    	
+    	int row = loansTable.getSelectedRow();
+    	
+    	if (row < 0) {
+    		
+    		return null;
+    	}
+    	
+    	ArrayList<Loan> loans = control.getLoans();
+    	
+    	if (row >= loans.size()) {
+    		
+    		return null;
+    	}
+    	
+    	return loans.get(row);
+    }
+    
+    //Interfaz para crear un prestamo nuevo
+    private void openNewLoanDialog() {
+    	
+    	if (control.getPeople().isEmpty()) {
+    		
+    		JOptionPane.showMessageDialog(this, "No registered people to lend to", "Error", JOptionPane.ERROR_MESSAGE);
+    	
+    		return;
+    	}
+    	
+    	ArrayList<Item> available = new ArrayList<>();
+    	
+    	for (Item i : control.getItems()) {
+    		
+    		if (!i.isLend()) {
+    			
+    			available.add(i);
+    		}
+    	}
+    	
+    	if (available.isEmpty()) {
+    		
+    		JOptionPane.showMessageDialog(this, "No available items to lend", "Error", JOptionPane.ERROR_MESSAGE);
+        	
+    		return;
+    	}
+    	
+    	JDialog dialog = new JDialog(this, "New loan", true);
+    	
+    	dialog.setSize(550, 480);
+    	
+    	dialog.setLocationRelativeTo(this);
+    	
+    	dialog.setLayout(new BorderLayout(10, 10));
+    	
+    	JPanel top = new JPanel(new FlowLayout(FlowLayout.LEFT));
+    	
+    	top.add(new JLabel("Person:"));
+    	
+    	JComboBox<String> cmbPerson = new JComboBox<>();
+    	
+    	for (Person p : control.getPeople()) {
+    		
+    		cmbPerson.addItem(p.getName());
+    	}
+
+    	top.add(cmbPerson);
+    	
+    	dialog.add(top, BorderLayout.NORTH);
+    	
     	
     }
 

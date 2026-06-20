@@ -10,7 +10,7 @@ import javax.swing.table.DefaultTableModel;
 
 import java.awt.*;
 
-public class CategoriesPanel extends JPanel{
+public class CategoriesPanel extends JPanel {
 	
 	private static final long serialVersionUID = 1L;
 	
