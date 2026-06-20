@@ -16,6 +16,12 @@ public class CategoriesPanel extends JPanel {
 	
 	private Control control;
 	
+	private DefaultTableModel tableModel;
+	
+    private JTable table;
+    
+    private JTextField txtName;
+	
 	public CategoriesPanel(Control control) {
 		
         this.control = control;
@@ -31,9 +37,37 @@ public class CategoriesPanel extends JPanel {
 	
 	private void buildUI() {
 		
+		String[] columns = {"Name", "Items"};
+		
+		tableModel = new DefaultTableModel(columns, 0) {
+			
+			public boolean isCellEditable(int r, int c) {
+				
+				return false;
+			}
+		};
+		
+		table = new JTable(tableModel);
+		
+		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		
+        table.setRowHeight(24);
+        
+        table.getSelectionModel().addListSelectionListener(e -> fillForm());
+        
+        add(new JScrollPane(table), BorderLayout.CENTER);
+        
+        JPanel form = new JPanel(new GridBagLayout());
+        
+        form.setBorder(BorderFactory.createTitledBorder("Category data"));
+		
 	}
 	
 	private void refreshTable() {
+		
+	}
+	
+	private void fillForm() {
 		
 	}
 
