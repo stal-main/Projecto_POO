@@ -157,13 +157,18 @@ public class LoansWindow extends JFrame {
     	
     	btnNew.addActionListener(e -> openNewLoanDialog());
     	
+    	btnFinish.addActionListener(e -> finishLoan());
+    	
     }
     
     private void refreshLoansTable() {
     	
+    	loansModel.setRowCount(0);
     }
     
     private void refreshItemsTable() {
+    	
+    	loansModel.setRowCount(0);
     	
     }
     
@@ -184,6 +189,33 @@ public class LoansWindow extends JFrame {
     	}
     	
     	return loans.get(row);
+    }
+    
+    private void finishLoan() {
+    	
+    	Loan loan = getSelectedLoan();
+    	
+    	if (loan == null) {
+    		
+    		JOptionPane.showMessageDialog(this, "Select a loan first", "Warning", JOptionPane.WARNING_MESSAGE);
+    		
+    		return;
+    	}
+    	
+    	int confirm = JOptionPane.showConfirmDialog(this, "Finish " + loan.getPerson().getName() + "'s loan?\n All the items will now be available", "Confirm", JOptionPane.YES_NO_OPTION);
+    	
+    	if (confirm != JOptionPane.YES_OPTION) {
+    		
+    		return;
+    	}
+    	
+    	control.endLoan(loan);
+    	
+    	refreshLoansTable();
+    	
+    	itemsModel.setRowCount(0);
+    	
+        lblLoanInfo.setText(" ");
     }
     
     //Interfaz para crear un prestamo nuevo
