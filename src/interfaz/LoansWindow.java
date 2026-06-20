@@ -8,6 +8,7 @@ import javax.swing.table.DefaultTableModel;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Date;
 
 import javax.swing.*;
 
@@ -159,16 +160,48 @@ public class LoansWindow extends JFrame {
     	
     	btnFinish.addActionListener(e -> finishLoan());
     	
+    	btnReturn.addActionListener(e -> returnItem());
+    	
     }
     
     private void refreshLoansTable() {
     	
     	loansModel.setRowCount(0);
+    	
+    	for (Loan l : control.getLoans()) {
+    		
+    		loansModel.addRow(new Object[] {
+    				
+    				l.getPerson().getName(),
+    				
+    				l.getDate().toString(),
+    				
+    				l.getItems().size()
+    		});
+    	}
     }
     
     private void refreshItemsTable() {
     	
-    	loansModel.setRowCount(0);
+    	itemsModel.setRowCount(0);
+    	
+    	Loan loan = getSelectedLoan();
+    	
+    	if (loan == null) {
+    		
+    		lblLoanInfo.setText(" ");
+    		
+            return;
+    	}
+    	
+    	String alertInfo = loan.getAlert() != null ? "Alert: " + loan.getAlert().getMessage() : " No alert";
+    	
+    	lblLoanInfo.setText("Lend to " + loan.getPerson().getName() + alertInfo);
+    	
+    	for (Item i : loan.getItems()) {
+    		
+            itemsModel.addRow(new Object[]{i.getCode(), i.getName(), i.getType().getName()});
+        }
     	
     }
     
@@ -216,6 +249,50 @@ public class LoansWindow extends JFrame {
     	itemsModel.setRowCount(0);
     	
         lblLoanInfo.setText(" ");
+    }
+    
+    private void returnItem() {
+    	
+    	Loan loan = getSelectedLoan();
+    	
+    	if (loan == null) {
+    		
+    		JOptionPane.showMessageDialog(this, "Select a loan first.", "Aviso", JOptionPane.WARNING_MESSAGE);
+    		
+    		return;
+    	}
+    	
+    	int itemRow = itemsTable.getSelectedRow();
+    	
+    	if (itemRow < 0) {
+    		
+    		return;
+    	}
+    	
+    	String code = (String) itemsModel.getValueAt(itemRow, 0);
+    	
+        String name = (String) itemsModel.getValueAt(itemRow, 1);
+        
+        int confirm = JOptionPane.showConfirmDialog(this, "Return" + name + "from the loan?", "Confirm return", JOptionPane.YES_NO_OPTION);
+        
+        if (confirm != JOptionPane.YES_OPTION) {
+        	
+        	return;
+        }
+        
+        try {
+        	
+            control.returnItem(loan, code);
+            
+            refreshLoansTable();
+            
+            refreshItemsTable();
+        } 
+        
+        catch (Exception ex) {
+        	
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
     
     //Interfaz para crear un prestamo nuevo
@@ -268,7 +345,260 @@ public class LoansWindow extends JFrame {
     	
     	dialog.add(top, BorderLayout.NORTH);
     	
+    	DefaultListModel<String> availableModel = new DefaultListModel<>();
     	
+    	for (Item i : available) {
+    		
+    		availableModel.addElement(i.getCode() + " " + i.getName());
+    	}
+    	
+    	JList<String> lstAvailable = new JList<>(availableModel);
+    	
+    	lstAvailable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    	
+    	DefaultListModel<String> selectedModel = new DefaultListModel<>();
+    	
+        JList<String> lstSelected = new JList<>(selectedModel);
+        
+        lstSelected.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        
+        JButton btnAdd    = new JButton("Add");
+        
+        JButton btnRemove = new JButton("Remove");
+        
+        JPanel centerPanel = new JPanel(new GridLayout(1, 3, 6, 0));
+        
+        //Panel para los items disponibles
+        
+        JPanel avPanel = new JPanel(new BorderLayout());
+        
+        avPanel.setBorder(BorderFactory.createTitledBorder("Available items"));
+        
+        avPanel.add(new JScrollPane(lstAvailable), BorderLayout.CENTER);
+        
+        JPanel btnMid = new JPanel(new GridLayout(3, 1, 0, 8));
+        
+        btnMid.setBorder(BorderFactory.createEmptyBorder(60, 4, 0, 4));
+        
+        btnMid.add(btnAdd);
+        
+        btnMid.add(btnRemove);
+        
+        //Panel para los items selecciones
+        
+        JPanel selPanel = new JPanel(new BorderLayout());
+        
+        selPanel.setBorder(BorderFactory.createTitledBorder("Loan's items"));
+        
+        selPanel.add(new JScrollPane(lstSelected), BorderLayout.CENTER);
+        
+        centerPanel.add(avPanel);
+        
+        centerPanel.add(btnMid);
+        
+        centerPanel.add(selPanel);
+        
+        dialog.add(centerPanel, BorderLayout.CENTER);
+        
+        JPanel alertPanel = new JPanel(new GridBagLayout());
+        
+        alertPanel.setBorder(BorderFactory.createTitledBorder("Alert (optional)"));
+        
+        GridBagConstraints gbc = new GridBagConstraints();
+        
+        gbc.insets = new Insets(4, 6, 4, 6);
+        
+        gbc.anchor = GridBagConstraints.WEST;
+        
+        JCheckBox checkAlert = new JCheckBox("Add alert");
+        
+        gbc.gridx = 0;
+        
+        gbc.gridy = 0; 
+        
+        gbc.gridwidth = 4;
+        
+        alertPanel.add(checkAlert, gbc);
+        
+        JTextField txtMsg = new JTextField(18);
+        
+        JTextField txtDays = new JTextField(5);
+        
+        JComboBox<String> cmbAlertType = new JComboBox<>(new String[]{"UNIQUE", "RECURRENT"});
+        
+        txtMsg.setEnabled(false);
+        
+        txtDays.setEnabled(false);
+        
+        cmbAlertType.setEnabled(false);
+        
+        gbc.gridy = 1;
+        
+        gbc.gridwidth = 1;
+        
+        gbc.gridx = 0; 
+        
+        alertPanel.add(new JLabel("Message:"), gbc);
+        
+        gbc.gridx = 1; 
+        
+        alertPanel.add(txtMsg, gbc);
+        
+        gbc.gridx = 2; 
+        
+        alertPanel.add(new JLabel("Days"), gbc);
+        
+        gbc.gridx = 3; 
+        
+        alertPanel.add(txtDays, gbc);
+        
+        gbc.gridy = 2; 
+        
+        gbc.gridx = 0;
+        
+        alertPanel.add(new JLabel("Type:"), gbc);
+        
+        gbc.gridx = 1;
+        
+        alertPanel.add(cmbAlertType, gbc);
+        
+        checkAlert.addActionListener(e -> {
+        	
+        	boolean on = checkAlert.isSelected();
+        	
+        	txtMsg.setEnabled(on);
+        	
+        	txtDays.setEnabled(on);
+        	
+        	cmbAlertType.setEnabled(on);
+        });
+        
+        dialog.add(alertPanel, BorderLayout.SOUTH);
+        
+        btnAdd.addActionListener(e -> {
+        	
+        	int sel = lstAvailable.getSelectedIndex();
+        	
+        	if (sel < 0) {
+        		
+        		return;
+        	}
+        	
+        	String val = availableModel.get(sel);
+        	
+            availableModel.remove(sel);
+            
+            selectedModel.addElement(val);
+        });
+        
+        btnRemove.addActionListener(e -> {
+        	
+        	int sel = lstSelected.getSelectedIndex();
+        	
+        	if (sel < 0) {
+        		
+        		return;
+        	}
+        	
+        	String val = selectedModel.get(sel);
+        	
+            selectedModel.remove(sel);
+            
+            availableModel.addElement(val);   	
+        });
+        
+        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        
+        JButton btnConfirm = new JButton("Confirm loan");
+        
+        JButton btnCancel  = new JButton("Cancel");
+        
+        btnConfirm.setBackground(new Color(40, 160, 90));
+        
+        btnConfirm.setForeground(Color.WHITE);
+        
+        btnConfirm.setFocusPainted(false);
+        
+        bottomPanel.add(btnConfirm);
+        
+        bottomPanel.add(btnCancel);
+        
+        JPanel southWrapper = new JPanel(new BorderLayout());
+        
+        southWrapper.add(alertPanel, BorderLayout.CENTER);
+        
+        southWrapper.add(bottomPanel, BorderLayout.SOUTH);
+        
+        dialog.add(southWrapper, BorderLayout.SOUTH);
+        
+        btnCancel.addActionListener(e -> dialog.dispose());
+        
+        btnConfirm.addActionListener(e -> {
+        	
+        	if(selectedModel.isEmpty()) {
+        		
+        		JOptionPane.showMessageDialog(dialog, "Add at least one item to the loan", "Error", JOptionPane.ERROR_MESSAGE);
+        		
+        		return;
+        	}
+        	
+        	String personName = (String) cmbPerson.getSelectedItem();
+        	
+        	 ArrayList<String> codes = new ArrayList<>();
+        	 
+        	 for (int i = 0; i < selectedModel.size(); i++) {
+        		 
+        		 String entry = selectedModel.get(i);
+        		 
+        		 codes.add(entry.split(" ")[0]);
+        	 }
+        	 
+        	 try {
+        		 
+        		 Loan newLoan = control.doLoan(personName, codes);
+        		 
+        		 if (checkAlert.isSelected()) {
+        			 
+        			 String msg = txtMsg.getText().trim();
+        			 
+        			 String days = txtDays.getText().trim();
+        			 
+        			 if (!msg.isEmpty() && !days.isEmpty()) {
+        				 
+        				 try {
+        					 
+        					 int d = Integer.parseInt(days);
+        					 
+        					 long ms = (long) d * 24L * 60L * 60L * 1000L;
+        					 
+        					 Date alertDate = new Date(System.currentTimeMillis() + ms);
+        					 
+        					 AlertType alertType = AlertType.valueOf((String) cmbAlertType.getSelectedItem());
+        					 
+        					 control.addAlert(newLoan, msg, alertDate, d, alertType);
+        				 }
+        				 
+        				 catch (NumberFormatException  ex) {
+        					 
+        					 JOptionPane.showMessageDialog(dialog, "Days must be an integer", "Error", JOptionPane.ERROR_MESSAGE);
+        					 
+        					 return;
+        				 }
+        			 }
+        		 }
+        		 
+        		 refreshLoansTable();
+        		 
+                 dialog.dispose();
+        	 }
+        	 
+        	 catch (Exception ex) {
+        		 
+        		 JOptionPane.showMessageDialog(dialog, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        		 
+        	 }
+        });
+        
+        dialog.setVisible(true);    	    	
     }
-
 }
