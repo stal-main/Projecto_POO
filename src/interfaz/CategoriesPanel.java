@@ -60,6 +60,14 @@ public class CategoriesPanel extends JPanel {
         JPanel form = new JPanel(new GridBagLayout());
         
         form.setBorder(BorderFactory.createTitledBorder("Category data"));
+        
+        GridBagConstraints gbc = new GridBagConstraints();
+        
+        gbc.insets = new Insets(5, 5, 5, 5);
+        
+        gbc.anchor = GridBagConstraints.WEST;
+        
+        add(form, BorderLayout.SOUTH);
 		
 	}
 	
@@ -68,6 +76,12 @@ public class CategoriesPanel extends JPanel {
 	}
 	
 	private void fillForm() {
+		
+		int row = table.getSelectedRow();
+		
+	}
+	
+	private void addCategory() {
 		
 	}
 
