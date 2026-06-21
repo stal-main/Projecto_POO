@@ -165,7 +165,7 @@ public class MainWindow extends JFrame {
 			sb.append(" Type: ").append(a.getType()).append("\n\n");
 		}
 		
-		JOptionPane.showMessageDialog(this, sb.toString(), "Pending Alerts (" + actives.size(), JOptionPane.WARNING_MESSAGE);
+		JOptionPane.showMessageDialog(this, sb.toString(), "Pending Alerts (" + actives.size() + ")", JOptionPane.WARNING_MESSAGE);
 		
 		control.saveData();
 	}

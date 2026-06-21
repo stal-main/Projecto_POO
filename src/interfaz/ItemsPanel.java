@@ -341,6 +341,8 @@ public class ItemsPanel extends JPanel {
         if (type == null) {
         	
         	JOptionPane.showMessageDialog(this, "There must be at least one type", "Error", JOptionPane.ERROR_MESSAGE);
+        
+        	return;
         }
         
         try {
