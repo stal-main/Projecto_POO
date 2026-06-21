@@ -548,7 +548,7 @@ public class Control implements Serializable {
  
             if (t.getItems().isEmpty()) {
             	
-                sb.append("no items of this type\n");
+                sb.append("No items of this type\n");
             } 
             
             else {
