@@ -138,43 +138,15 @@ public class LoansWindow extends JFrame {
         
         //Botones del panel derecho
         
-        JButton btnAddItem = new JButton("Add item to loan");
-        
-        JButton btnRemItem = new JButton("Remove item from loan");
-        
-        JButton btnReturn = new JButton("Return selected item");
-        
-        btnAddItem.setBackground(new Color(40, 130, 160));
-        
-        btnAddItem.setForeground(Color.WHITE);
-        
-        btnAddItem.setFocusPainted(false);
-        
-        btnRemItem.setBackground(new Color(160, 90, 40));
-        
-        btnRemItem.setForeground(Color.WHITE);
-        
-        btnRemItem.setFocusPainted(false);
+        JButton btnReturn = new JButton("Return selected item");   
         
         btnReturn.setBackground(new Color(200, 130, 30));
         
         btnReturn.setForeground(Color.WHITE);
         
         btnReturn.setFocusPainted(false);
-        
-        JPanel itemBtnsTop = new JPanel(new GridLayout(1, 2, 6, 0));
-        
-        itemBtnsTop.add(btnAddItem);
-        
-        itemBtnsTop.add(btnRemItem);
-        
-        JPanel itemBtnsWrapper = new JPanel(new BorderLayout(0, 4));
-        
-        itemBtnsWrapper.add(itemBtnsTop, BorderLayout.NORTH);
-        
-        itemBtnsWrapper.add(btnReturn, BorderLayout.SOUTH);
-        
-        rightPanel.add(itemBtnsWrapper, BorderLayout.SOUTH);	
+                 
+        rightPanel.add(btnReturn, BorderLayout.SOUTH);	
     	
     	JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, rightPanel);
     	
@@ -188,12 +160,7 @@ public class LoansWindow extends JFrame {
     	
     	btnFinish.addActionListener(e -> finishLoan());
     	
-    	btnReturn.addActionListener(e -> returnItem());
-    	
-    	btnAddItem.addActionListener(e -> openAddItemDialog());
-    	
-    	btnRemItem.addActionListener(e -> removeItemFromLoan());
-    	
+    	btnReturn.addActionListener(e -> returnItem());   	
     }
     
     private void refreshLoansTable() {
@@ -324,112 +291,6 @@ public class LoansWindow extends JFrame {
         catch (Exception ex) {
         	
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-    
-    private void openAddItemDialog() {
-    	
-    	Loan loan = getSelectedLoan();
-    	
-    	if (loan == null) {
-    		
-    		JOptionPane.showMessageDialog(this, "Select a loan first.", "Warning", JOptionPane.WARNING_MESSAGE);
-    		
-    		return;
-    	}
-    	
-    	ArrayList<Item> available = new ArrayList<>();
-    	
-    	for (Item i : control.getItems()) {
-    		
-    		if (!i.isLend()) {
-    			
-    			available.add(i);
-    		}
-    	}
-    	
-    	if (available.isEmpty()) {
-    		
-    		JOptionPane.showMessageDialog(this, "No available items to add.", "Error", JOptionPane.ERROR_MESSAGE);
-    		
-    		return;
-    	}
-    	
-    	String[] options = new String[available.size()];
-    	
-    	for (int i = 0; i < available.size(); i++) {
-    		
-    		options[i] = available.get(i).getCode() + " - " + available.get(i).getName();
-    	}
-    	
-    	String choice = (String) JOptionPane.showInputDialog(this, "Select an item to add to " + loan.getPerson().getName() + "'s loan:", "Add item", JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
-    	
-    	if (choice == null) {
-    		
-    		return;
-    	}
-    	
-    	String code = choice.split(" - ")[0];
-    	
-    	try {
-    		
-    		control.addItemToLoan(loan, code);
-    		
-    		refreshLoansTable();
-    		
-    		refreshItemsTable();
-    	}
-    	
-    	catch (Exception ex) {
-    		
-    		JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-    	}
-    	
-    }
-    
-    private void removeItemFromLoan() {
-    	
-    	Loan loan = getSelectedLoan();
-    	
-    	if (loan == null) {
-    		
-    		JOptionPane.showMessageDialog(this, "Select a loan first.", "Warning", JOptionPane.WARNING_MESSAGE);
-    		
-    		return;
-    	}
-    	
-    	int itemRow = itemsTable.getSelectedRow();
-    	
-    	if (itemRow < 0) {
-    		
-    		JOptionPane.showMessageDialog(this, "Select an item from the loan first.", "Warning", JOptionPane.WARNING_MESSAGE);
-    		
-    		return;
-    	}
-    	
-    	String code = (String) itemsModel.getValueAt(itemRow, 0);
-    	
-        String name = (String) itemsModel.getValueAt(itemRow, 1);
-        
-        int confirm = JOptionPane.showConfirmDialog(this, "Remove " + name + " from the loan?", "Confirm removal", JOptionPane.YES_NO_OPTION);
-        
-        if (confirm != JOptionPane.YES_OPTION) {
-        	
-        	return;
-        }
-        
-        try {
-        	
-        	control.removeItemFromLoan(loan, code);
-        	
-        	refreshLoansTable();
-        	
-        	refreshItemsTable();
-        }
-        
-        catch (Exception ex) {
-        	
-        	JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
     

@@ -355,25 +355,6 @@ public class Control implements Serializable {
 		return l;
 	}
 	
-	public void addItemToLoan(Loan l, String itemCode) throws Exception {
-		 
-		Item i = findItem(itemCode);
- 
-		if (i.isLend()) {
- 
-			throw new Exception("Item '" + i.getName() + "' is already lent out");
-		}
- 
-		l.addItem(i);
-	}
-	
-	public void removeItemFromLoan(Loan l, String itemCode) throws Exception {
-		 
-		Item i = findItem(itemCode);
- 
-		l.deleteItem(i);
-	}
-	
 	public void returnItem(Loan l, String itemCode) throws Exception {
 		 
 		Item i = findItem(itemCode);
